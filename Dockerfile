@@ -3,7 +3,7 @@
 # =========================================
 
 # Use a lightweight Node.js image for building (customizable via ARG)
-FROM dhi.io/node:24-alpine3.22-dev AS builder
+FROM node:20-alpine AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -24,7 +24,7 @@ RUN npm run build
 # Stage 2: Prepare Nginx to Serve Static Files
 # =========================================
 
-FROM dhi.io/nginx:1.28.0-alpine3.21-dev AS runner
+FROM nginx:stable-alpine AS runner
 
 # Copy custom Nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
