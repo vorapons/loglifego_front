@@ -16,10 +16,10 @@ COPY package.json package-lock.json* ./
 
 # Install project dependencies using npm ci (ensures a clean, reproducible install)
 # RUN --mount=type=cache,target=/root/.npm npm ci
-RUN npm install 
+RUN npm install -g serve
 
 # Copy the rest of the application source code into the container
-COPY . .
+COPY --from=build /app/build ./build
 
 # # Build the React.js application (outputs to /app/dist)
 # RUN npm run build
@@ -48,7 +48,8 @@ EXPOSE 8080
 # CMD ["-g", "daemon off;"]
 
 # Use $PORT so it works both locally and on Cloud Run
-CMD ["sh", "-c", "serve -s dist -l ${PORT}"]
+# CMD ["sh", "-c", "serve -s dist -l ${PORT}"]
+CMD ["serve","-s","build","-l","8080"]
 
 # # ---------- Build stage ----------
 # FROM node:20-alpine AS builder
