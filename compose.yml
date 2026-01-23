@@ -1,20 +1,41 @@
-services:
-  react-prod:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: docker-reactjs-sample
-    ports:
-      - "8080:8080"
+# services:
+#   react-prod:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     image: docker-reactjs-sample
+#     ports:
+#       - "8080:8080"
 
-  react-dev:
+#   react-dev:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile.dev
+#     ports:
+#       - "5173:5173"
+#     develop:
+#       watch:
+#         - action: sync
+#           path: .
+#           target: /app
+
+services:
+  server:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      args:
+        - VITE_BACKEND_URL=${VITE_BACKEND_URL}
+    environment:
+      NODE_ENV: production
+      VITE_BACKEND_URL : http://127.0.0.1:3456
+      
     ports:
-      - "5173:5173"
-    develop:
-      watch:
-        - action: sync
-          path: .
-          target: /app
+      - 8080:8080
+
+
+      # VITE_BACKEND_URL : https://loglifegov1-1071770156665.asia-southeast3.run.app
+
+      
+
+
+

@@ -1,9 +1,11 @@
 # =========================================
 # Stage 1: Build the React.js Application
 # =========================================
+ARG NODE_VERSION=24.12.0-alpine
+ARG NGINX_VERSION=alpine3.22
 
 # Use a lightweight Node.js image for building (customizable via ARG)
-FROM node:20-alpine AS builder
+FROM node:${NODE_VERSION} AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -17,6 +19,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 # Copy the rest of the application source code into the container
 COPY . .
 
+# Set the environment variable # Define the build argument
+# ARG VITE_BACKEND_URL 
+# ENV VITE_BACKEND_URL=http://127.0.0.1:3456
+# ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+ENV VITE_BACKEND_URL=https://loglifegov1-1071770156665.asia-southeast3.run.app
+ENV NODE_ENV=production
+
 # Build the React.js application (outputs to /app/dist)
 RUN npm run build
 
@@ -24,7 +33,7 @@ RUN npm run build
 # Stage 2: Prepare Nginx to Serve Static Files
 # =========================================
 
-FROM nginx:stable-alpine AS runner
+FROM nginxinc/nginx-unprivileged:${NGINX_VERSION} AS runner
 
 # Copy custom Nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -32,7 +41,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Copy the static build output from the build stage to Nginx's default HTML serving directory
 COPY --chown=nginx:nginx --from=builder /app/dist /usr/share/nginx/html
 
-# Use a non-root user for security best practices
+# Use a built-in non-root user for security best practices
 USER nginx
 
 # Expose port 8080 to allow HTTP traffic
